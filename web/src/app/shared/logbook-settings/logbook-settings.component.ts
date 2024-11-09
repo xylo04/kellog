@@ -19,7 +19,10 @@ import { SecretService } from '../secret/secret.service';
 export class LogbookSettingsComponent implements OnInit {
   logbookSettingsForm: FormGroup;
   @ViewChild('saveButton') saveButton: MatButton;
-  qthProfile = {} as Station;
+  qthProfiles: { [name: string]: Station } = {};
+  activeProfile: Station;
+  activeProfileName: string;
+  profileNameInput: string;
 
   constructor(
     private dialog: MatDialogRef<any>,
@@ -42,7 +45,8 @@ export class LogbookSettingsComponent implements OnInit {
   ngOnInit(): void {
     this.logbookService.init();
     this.logbookService.settings$.subscribe((settings) => {
-      this.qthProfile = settings.qthProfile;
+      this.qthProfiles = settings.qthProfiles;
+      this.activeProfileName = settings.activeProfile;
     });
   }
 
@@ -55,7 +59,8 @@ export class LogbookSettingsComponent implements OnInit {
 
   save(): void {
     const qthObs = this.logbookService.set({
-      qthProfile: this.qthProfile,
+      qthProfiles: this.qthProfiles,
+      // qthProfile: null,
     } as LogbookSettings);
 
     const formValue = this.logbookSettingsForm.value;
@@ -71,5 +76,28 @@ export class LogbookSettingsComponent implements OnInit {
     );
 
     this.dialog.close(forkJoin([qthObs, secretsObs]));
+  }
+
+  addProfile() {
+    this.qthProfiles[this.profileNameInput] = {};
+    this.activeProfileName = this.profileNameInput;
+    this.activeProfile = this.qthProfiles[this.profileNameInput];
+    this.profileNameInput = '';
+  }
+
+  renameProfile() {
+    this.qthProfiles[this.profileNameInput] = this.qthProfiles[
+      this.activeProfileName
+    ];
+    delete this.qthProfiles[this.activeProfileName];
+    this.activeProfileName = this.profileNameInput;
+    this.activeProfile = this.qthProfiles[this.profileNameInput];
+    this.profileNameInput = '';
+  }
+
+  deleteProfile() {
+    delete this.qthProfiles[this.activeProfileName];
+    this.activeProfileName = 'default';
+    this.activeProfile = this.qthProfiles[this.activeProfileName];
   }
 }

@@ -5,8 +5,33 @@
       <mat-card-subtitle>QTH Profile</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
+      <mat-form-field>
+        <mat-select [(value)]="activeProfileName">
+          <mat-option
+            *ngFor="let profile of qthProfiles | keyvalue"
+            [value]="profile.key"
+            (click)="activeProfile = profile.value"
+          >
+            {{ profile.key }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="addProfile()">
+        Add Profile
+      </button>
+      <button mat-raised-button color="primary" (click)="renameProfile()">
+        Rename Profile
+      </button>
+      <button mat-raised-button color="warn" (click)="deleteProfile()">
+        Delete Profile
+      </button>
+      <mat-form-field>
+        <mat-label>Profile Name</mat-label>
+        <input matInput [(ngModel)]="profileNameInput" />
+      </mat-form-field>
+
       <kel-station-detail
-        [(station)]="qthProfile"
+        [(station)]="qthProfiles[activeProfileName]"
         (stationChange)="enableSaveButton()"
         [showTxPower]="false"
       ></kel-station-detail>
@@ -45,7 +70,7 @@
           <mat-form-field>
             <mat-label>QRZ.com Password</mat-label>
             <input matInput type="password" formControlName="qrzPass" />
-            <mat-hint> Requires QRZ.com XML subscription </mat-hint>
+            <mat-hint> Requires QRZ.com XML subscription</mat-hint>
           </mat-form-field>
         </div>
         <div class="row"><h3>Logbook of the World</h3></div>
@@ -53,7 +78,7 @@
           <mat-form-field>
             <mat-label>LotW Username</mat-label>
             <input matInput formControlName="lotwUser" />
-            <mat-hint> For querying QSL status from LotW </mat-hint>
+            <mat-hint> For querying QSL status from LotW</mat-hint>
           </mat-form-field>
           <mat-form-field>
             <mat-label>LotW Password</mat-label>

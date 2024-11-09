@@ -41,7 +41,12 @@ export class LogbookService {
         logbookId,
       ) as DocumentReference<LogbookSettings>;
       onSnapshot(docRef, (doc) => {
-        this.settings$.next(doc.data());
+        let data = doc.data();
+        if (data.qthProfiles == undefined) {
+          data.activeProfile = 'default';
+          data.qthProfiles = { default: data.qthProfile };
+        }
+        this.settings$.next(data);
       });
     });
   }
@@ -92,4 +97,6 @@ export interface LogbookSettings {
   lotwLastFetchedDate: Date;
   qrzLogbookApiKeyLastSet: Date;
   qthProfile: Station;
+  activeProfile: string;
+  qthProfiles: { [name: string]: Station };
 }
